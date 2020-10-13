@@ -9,23 +9,47 @@ from flask import Flask, request
 app = Flask(__name__)
 
 AWESOMENESS = [
-    'awesome', 'terrific', 'fantastic', 'neato', 'fantabulous', 'wowza',
-    'oh-so-not-meh', 'brilliant', 'ducky', 'coolio', 'incredible',
-    'wonderful', 'smashing', 'lovely']
+    "awesome",
+    "terrific",
+    "fantastic",
+    "neato",
+    "fantabulous",
+    "wowza",
+    "oh-so-not-meh",
+    "brilliant",
+    "ducky",
+    "coolio",
+    "incredible",
+    "wonderful",
+    "smashing",
+    "lovely",
+]
 
 
-@app.route('/')
+@app.route("/")
 def start_here():
     """Home page."""
 
-    return "<!doctype html><html>Hi! This is the home page.</html>"
+    return """
+    <!doctype html>
+    <html>
+      <p>Hi! This is the home page.</p>
+      <a href="/hello">Click Here!</a>
+    </html>"""
 
 
-@app.route('/hello')
+@app.route("/hello")
 def say_hello():
     """Say hello and prompt for user's name."""
 
-    return """
+    newline = "\n"
+
+    options = [
+        f"<option value={compliment}>{compliment}</option>"
+        for compliment in AWESOMENESS
+    ]
+
+    return f"""
     <!doctype html>
     <html>
       <head>
@@ -34,7 +58,16 @@ def say_hello():
       <body>
         <h1>Hi There!</h1>
         <form action="/greet">
-          What's your name? <input type="text" name="person">
+          <div>
+            <label for="person">What's your name?</label>
+            <input type="text" name="person" id="person">
+          </div>
+          <div>
+            <label for="compliment">Select a Compliment:</label>
+            <select name="compliment" id="compliment" action="/greet">
+              {newline.join(options)}
+            </select>
+          </div>
           <input type="submit" value="Submit">
         </form>
       </body>
@@ -42,13 +75,13 @@ def say_hello():
     """
 
 
-@app.route('/greet')
+@app.route("/greet")
 def greet_person():
     """Get user by name."""
 
     player = request.args.get("person")
 
-    compliment = choice(AWESOMENESS)
+    compliment = request.args.get("compliment")
 
     return """
     <!doctype html>
@@ -60,10 +93,12 @@ def greet_person():
         Hi, {}! I think you're {}!
       </body>
     </html>
-    """.format(player, compliment)
+    """.format(
+        player, compliment
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # debug=True gives us error messages in the browser and also "reloads"
     # our web app if we change the code.
     app.run(debug=True, host="0.0.0.0")
